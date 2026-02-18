@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#2a1a0e">
+  <title>江湖卡牌</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%232a1a0e'/><text x='32' y='46' font-size='36' text-anchor='middle' fill='%23f5f0e8' font-family='serif'>侠</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- ===== MENU SCREEN ===== -->
+    <div id="menu-screen" class="screen active">
+      <div class="menu-bg">
+        <div class="ink-mountain"></div>
+        <div class="ink-cloud c1"></div>
+        <div class="ink-cloud c2"></div>
+      </div>
+      <div class="menu-content">
+        <div class="menu-title-wrap">
+          <div class="menu-sub">水墨武侠 · 集换对战</div>
+          <h1 class="menu-title">江湖卡牌</h1>
+          <div class="menu-line"></div>
+          <div class="menu-quote">一卡在手，笑傲江湖</div>
+        </div>
+        <div class="menu-buttons">
+          <button class="btn-ink btn-primary" id="btn-start">开始对战</button>
+          <button class="btn-ink btn-secondary" id="btn-collection">卡牌图鉴</button>
+          <button class="btn-ink btn-secondary" id="btn-records">战绩录</button>
+        </div>
+        <div class="menu-footer">
+          <span id="menu-stats"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== COLLECTION SCREEN ===== -->
+    <div id="collection-screen" class="screen">
+      <div class="screen-header">
+        <button class="btn-back" id="btn-col-back">← 返回</button>
+        <h2 class="screen-title">卡牌图鉴</h2>
+      </div>
+      <div id="collection-grid" class="collection-grid"></div>
+    </div>
+
+    <!-- ===== RECORDS SCREEN ===== -->
+    <div id="records-screen" class="screen">
+      <div class="screen-header">
+        <button class="btn-back" id="btn-rec-back">← 返回</button>
+        <h2 class="screen-title">战绩录</h2>
+      </div>
+      <div id="records-content" class="records-content"></div>
+    </div>
+
+    <!-- ===== BATTLE SCREEN ===== -->
+    <div id="battle-screen" class="screen">
+      <!-- Opponent info -->
+      <div id="opponent-info" class="hero-bar opponent-bar">
+        <div class="hero-portrait opp-portrait">
+          <svg viewBox="0 0 40 40"><text x="20" y="30" text-anchor="middle" font-size="24" fill="#888" font-family="serif">敌</text></svg>
+        </div>
+        <div class="hero-stats">
+          <span class="hero-name">江湖对手</span>
+          <div class="hero-numbers">
+            <span class="hp-display" id="opp-hp">❤ 30</span>
+            <span class="mana-display" id="opp-mana">💎 0/0</span>
+          </div>
+        </div>
+        <div class="deck-count" id="opp-deck-count">牌库: 0</div>
+      </div>
+
+      <!-- Opponent hand -->
+      <div id="opponent-hand" class="hand-zone opponent-hand-zone"></div>
+
+      <!-- Opponent board -->
+      <div id="opponent-board" class="board-zone"></div>
+
+      <!-- Board divider -->
+      <div class="board-divider">
+        <div class="divider-line"></div>
+        <span class="divider-text" id="turn-indicator">第 1 回合</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Player board -->
+      <div id="player-board" class="board-zone"></div>
+
+      <!-- Player hand -->
+      <div id="player-hand" class="hand-zone player-hand-zone"></div>
+
+      <!-- Player info -->
+      <div id="player-info" class="hero-bar player-bar">
+        <div class="hero-portrait player-portrait">
+          <svg viewBox="0 0 40 40"><text x="20" y="30" text-anchor="middle" font-size="24" fill="#c41e3a" font-family="serif">侠</text></svg>
+        </div>
+        <div class="hero-stats">
+          <span class="hero-name">少侠</span>
+          <div class="hero-numbers">
+            <span class="hp-display" id="player-hp">❤ 30</span>
+            <span class="mana-display" id="player-mana">💎 0/0</span>
+          </div>
+        </div>
+        <button class="btn-end-turn" id="btn-end-turn">结束回合</button>
+      </div>
+
+      <!-- Attack target overlay for hero -->
+      <div class="hero-target-zone opp-hero-target" id="opp-hero-target"></div>
+
+      <!-- Message overlay -->
+      <div id="battle-msg" class="battle-msg hidden"></div>
+    </div>
+
+    <!-- ===== GAME OVER SCREEN ===== -->
+    <div id="gameover-screen" class="screen">
+      <div class="gameover-content">
+        <div class="gameover-brush"></div>
+        <h1 id="gameover-title" class="gameover-title">胜</h1>
+        <p id="gameover-sub" class="gameover-sub"></p>
+        <div class="gameover-stats" id="gameover-stats"></div>
+        <div class="gameover-buttons">
+          <button class="btn-ink btn-primary" id="btn-play-again">再战江湖</button>
+          <button class="btn-ink btn-secondary" id="btn-back-menu">返回主菜单</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card detail overlay -->
+    <div id="card-detail" class="card-detail-overlay hidden">
+      <div class="card-detail-content" id="card-detail-content"></div>
+    </div>
+
+    <!-- Ink splash effect container -->
+    <div id="fx-layer" class="fx-layer"></div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "江湖卡牌 - 武侠对战",
+  "short_name": "江湖卡牌",
+  "description": "水墨风武侠集换式卡牌对战游戏",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f0e8",
+  "theme_color": "#2a1a0e",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%232a1a0e'/><text x='256' y='340' font-size='280' text-anchor='middle' fill='%23f5f0e8' font-family='serif'>侠</text><line x1='100' y1='420' x2='412' y2='420' stroke='%23c41e3a' stroke-width='8' stroke-linecap='round'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='30' fill='%232a1a0e'/><text x='96' y='130' font-size='110' text-anchor='middle' fill='%23f5f0e8' font-family='serif'>侠</text><line x1='36' y1='158' x2='156' y2='158' stroke='%23c41e3a' stroke-width='4' stroke-linecap='round'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router';
-import { Wind, BookOpen, Activity, Sparkles, TrendingDown, TrendingUp, Calendar } from 'lucide-react';
+import { Wind, BookOpen, Activity, Sparkles, TrendingDown, TrendingUp, Calendar, Heart } from 'lucide-react';
 import type { JournalEntry, AnxietyLog } from '../App';
 
 interface DashboardProps {
@@ -100,6 +100,44 @@ export default function Dashboard({ journalEntries, anxietyLogs, loading }: Dash
           </div>
         </div>
       )}
+
+      {/* Card Game Banner */}
+      <button
+        onClick={() => navigate('/card-game')}
+        className="w-full mb-8 p-8 rounded-3xl text-left transition-all hover:scale-[1.01] relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, #1A0A0A 0%, #3D1518 50%, #4A1A1A 100%)',
+          boxShadow: '0 12px 40px rgba(196, 30, 58, 0.15)',
+          border: '1px solid rgba(196, 30, 58, 0.2)',
+        }}
+      >
+        <div className="absolute top-4 right-4 w-6 h-6 border-t border-r" style={{ borderColor: 'rgba(212,165,116,0.25)' }} />
+        <div className="absolute bottom-4 left-4 w-6 h-6 border-b border-l" style={{ borderColor: 'rgba(212,165,116,0.25)' }} />
+        <div className="flex items-center gap-5">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0"
+            style={{
+              background: 'rgba(196, 30, 58, 0.2)',
+              border: '1px solid rgba(196, 30, 58, 0.35)',
+            }}
+          >
+            <Heart className="w-8 h-8" style={{ color: '#C41E3A' }} fill="#C41E3A" />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-1">
+              <h2 className="text-xl font-semibold" style={{ color: '#F5E6D3', letterSpacing: '0.08em' }}>
+                缘牌 · 情侣卡牌
+              </h2>
+              <span className="px-2 py-0.5 rounded-full text-xs" style={{ backgroundColor: 'rgba(196,30,58,0.3)', color: '#F5E6D3', letterSpacing: '0.1em' }}>
+                中国风
+              </span>
+            </div>
+            <p className="text-sm" style={{ color: 'rgba(212,165,116,0.7)', lineHeight: '1.8' }}>
+              以五行为引，以真心为牌。抽一张缘牌，开启一段走心对话。
+            </p>
+          </div>
+        </div>
+      </button>
 
       {/* Main Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

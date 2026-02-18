@@ -5,6 +5,7 @@ import BreathingGuide from './screens/BreathingGuide';
 import Journal from './screens/Journal';
 import AnxietyTracker from './screens/AnxietyTracker';
 import Resources from './screens/Resources';
+import CardGame from './screens/CardGame';
 import { projectId, publicAnonKey } from '/utils/supabase/info';
 
 export interface JournalEntry {
@@ -153,6 +154,7 @@ function App() {
               } 
             />
             <Route path="/resources" element={<Resources />} />
+            <Route path="/card-game" element={<CardGame />} />
           </Routes>
         </div>
       </div>
