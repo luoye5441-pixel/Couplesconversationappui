@@ -391,6 +391,16 @@ html, body { width:100%; height:100%; overflow:hidden; touch-action:manipulation
 .cd-atk { color:#c41e3a; }
 .cd-hp-val { color:#1a5276; }
 
+/* ===== MUTE BUTTON ===== */
+.btn-mute {
+  position:absolute; top:8px; right:8px; z-index:20;
+  width:36px; height:36px; border-radius:50%; border:1.5px solid rgba(42,26,14,.2);
+  background:rgba(245,240,232,.85); backdrop-filter:blur(4px);
+  font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:transform .15s, background .15s; line-height:1; padding:0;
+}
+.btn-mute:active { transform:scale(.9); background:rgba(245,240,232,1); }
+
 /* ===== FX LAYER ===== */
 .fx-layer { position:absolute; inset:0; pointer-events:none; z-index:90; overflow:hidden; }
 

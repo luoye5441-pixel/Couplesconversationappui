@@ -72,6 +72,227 @@ const TYPE_NAMES = {
   heal:'医', buff:'辅', magic:'道',
 };
 
+// ===== AUDIO ENGINE (Web Audio API) =====
+let audioCtx = null;
+let isMuted = false;
+let bgmNodes = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function toggleMute() {
+  isMuted = !isMuted;
+  localStorage.setItem('wuxia_muted', isMuted ? '1' : '0');
+  const btn = $('#btn-mute');
+  if (btn) btn.textContent = isMuted ? '🔇' : '🔊';
+  if (isMuted && bgmNodes) { stopBgm(); }
+  if (!isMuted && game && game.phase === 'battle') { startBgm(); }
+}
+
+// --- 1. Play Card Sound (paper slide/swish) ---
+function sfxPlayCard() {
+  if (isMuted) return;
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  // White noise burst through bandpass for swish
+  const len = 0.12;
+  const buf = ctx.createBuffer(1, ctx.sampleRate * len, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const bp = ctx.createBiquadFilter();
+  bp.type = 'bandpass'; bp.frequency.value = 3000; bp.Q.value = 1.5;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.3, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + len);
+  src.connect(bp).connect(gain).connect(ctx.destination);
+  src.start(t); src.stop(t + len);
+}
+
+// --- 2. Minion Attack Sound (short punchy hit) ---
+function sfxAttack() {
+  if (isMuted) return;
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(200, t);
+  osc.frequency.exponentialRampToValueAtTime(80, t + 0.1);
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.35, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+  // Add noise layer
+  const nLen = 0.08;
+  const nBuf = ctx.createBuffer(1, ctx.sampleRate * nLen, ctx.sampleRate);
+  const nData = nBuf.getChannelData(0);
+  for (let i = 0; i < nData.length; i++) nData[i] = (Math.random() * 2 - 1) * (1 - i / nData.length);
+  const nSrc = ctx.createBufferSource();
+  nSrc.buffer = nBuf;
+  const nGain = ctx.createGain();
+  nGain.gain.setValueAtTime(0.2, t);
+  nGain.gain.exponentialRampToValueAtTime(0.001, t + nLen);
+  osc.connect(gain).connect(ctx.destination);
+  nSrc.connect(nGain).connect(ctx.destination);
+  osc.start(t); osc.stop(t + 0.15);
+  nSrc.start(t); nSrc.stop(t + nLen);
+}
+
+// --- 3. Hero Hurt Sound (deep thud) ---
+function sfxHeroHurt() {
+  if (isMuted) return;
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(120, t);
+  osc.frequency.exponentialRampToValueAtTime(40, t + 0.25);
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.4, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+  const dist = ctx.createWaveShaper();
+  const curve = new Float32Array(256);
+  for (let i = 0; i < 256; i++) { const x = (i / 128) - 1; curve[i] = x * 0.7; }
+  dist.curve = curve;
+  osc.connect(dist).connect(gain).connect(ctx.destination);
+  osc.start(t); osc.stop(t + 0.3);
+}
+
+// --- 4. Minion Death Sound (fading dissipation) ---
+function sfxDeath() {
+  if (isMuted) return;
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  // Descending tone + noise fade
+  const osc = ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(600, t);
+  osc.frequency.exponentialRampToValueAtTime(100, t + 0.4);
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.2, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+  const lp = ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.setValueAtTime(2000, t);
+  lp.frequency.exponentialRampToValueAtTime(200, t + 0.4);
+  osc.connect(lp).connect(gain).connect(ctx.destination);
+  osc.start(t); osc.stop(t + 0.5);
+}
+
+// --- 5. Victory Sound (Chinese pentatonic melody) ---
+function sfxVictory() {
+  if (isMuted) return;
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  // Pentatonic: C5 D5 E5 G5 A5 C6
+  const notes = [523, 587, 659, 784, 880, 1047];
+  const melody = [0, 2, 4, 5, 4, 5]; // indices
+  const dur = 0.18;
+  melody.forEach((ni, i) => {
+    const osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.value = notes[ni];
+    const gain = ctx.createGain();
+    const start = t + i * dur;
+    gain.gain.setValueAtTime(0, start);
+    gain.gain.linearRampToValueAtTime(0.25, start + 0.02);
+    gain.gain.setValueAtTime(0.25, start + dur * 0.6);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(start); osc.stop(start + dur + 0.05);
+  });
+}
+
+// --- 6. Defeat Sound (low descending tone) ---
+function sfxDefeat() {
+  if (isMuted) return;
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  const notes = [392, 349, 294, 262]; // G4 F4 D4 C4 descending
+  const dur = 0.3;
+  notes.forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    const gain = ctx.createGain();
+    const start = t + i * dur;
+    gain.gain.setValueAtTime(0, start);
+    gain.gain.linearRampToValueAtTime(0.25, start + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(start); osc.stop(start + dur + 0.05);
+  });
+}
+
+// --- 7. Turn Start Sound (crisp chime) ---
+function sfxTurnStart() {
+  if (isMuted) return;
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  // Two-note chime: E5 + A5
+  [659, 880].forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    const gain = ctx.createGain();
+    const start = t + i * 0.1;
+    gain.gain.setValueAtTime(0.3, start);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + 0.4);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(start); osc.stop(start + 0.45);
+  });
+}
+
+// --- 8. Background Music (simple pentatonic loop) ---
+function startBgm() {
+  if (isMuted || bgmNodes) return;
+  const ctx = getAudioCtx();
+  // Chinese pentatonic: A3 C4 D4 E4 G4 A4
+  const scale = [220, 262, 294, 330, 392, 440];
+  const masterGain = ctx.createGain();
+  masterGain.gain.value = 0.06; // Very quiet
+  masterGain.connect(ctx.destination);
+
+  let timeoutId = null;
+  const nodes = { masterGain, oscs: [], timeoutId: null, stopped: false };
+
+  function playNote() {
+    if (nodes.stopped) return;
+    const freq = scale[Math.floor(Math.random() * scale.length)];
+    const osc = ctx.createOscillator();
+    osc.type = Math.random() > 0.5 ? 'sine' : 'triangle';
+    osc.frequency.value = freq;
+    const g = ctx.createGain();
+    const t = ctx.currentTime;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(1, t + 0.15);
+    g.gain.setValueAtTime(1, t + 0.6);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+    osc.connect(g).connect(masterGain);
+    osc.start(t); osc.stop(t + 1.3);
+    nodes.oscs.push(osc);
+    // Clean up old oscs
+    if (nodes.oscs.length > 10) nodes.oscs = nodes.oscs.slice(-5);
+    // Schedule next note with some randomness (0.8-1.6s)
+    const delay = 800 + Math.random() * 800;
+    nodes.timeoutId = setTimeout(playNote, delay);
+  }
+
+  playNote();
+  bgmNodes = nodes;
+}
+
+function stopBgm() {
+  if (!bgmNodes) return;
+  bgmNodes.stopped = true;
+  if (bgmNodes.timeoutId) clearTimeout(bgmNodes.timeoutId);
+  try { bgmNodes.masterGain.disconnect(); } catch(e) {}
+  bgmNodes = null;
+}
+
 // ===== UTILITY =====
 let _uid = 0;
 function uid() { return ++_uid; }
@@ -212,6 +433,7 @@ function startTurn() {
     setTimeout(() => aiTurn(), 800);
   } else {
     enableUI();
+    sfxTurnStart();
     showBattleMsg('你的回合', 800);
   }
 }
@@ -228,7 +450,8 @@ function playCard(player, handIndex) {
   const minion = createMinion(def, player === game.player ? 'player' : 'opponent');
   player.board.push(minion);
 
-  // Ink splash effect
+  // Sound + Ink splash effect
+  sfxPlayCard();
   spawnInkSplash(player === game.player ? 'player-board' : 'opponent-board');
 
   // Execute battlecry
@@ -289,6 +512,8 @@ function doAttack(attackerUid, targetUid) {
     game.stats[attacker.owner === 'player' ? 'playerDamageDealt' : 'opponentDamageDealt'] += attacker.attack;
     attacker.hasAttacked = true;
     attacker.canAttack = false;
+    sfxAttack();
+    sfxHeroHurt();
     showDamageNumber(enemy.isAI ? 'opp' : 'player', attacker.attack);
     animateAttack(attackerUid);
   } else {
@@ -306,6 +531,7 @@ function doAttack(attackerUid, targetUid) {
 
     attacker.hasAttacked = true;
     attacker.canAttack = false;
+    sfxAttack();
 
     showDamageNumber('minion-' + target.uid, attacker.attack);
     if (target.attack > 0) showDamageNumber('minion-' + attacker.uid, target.attack);
@@ -338,7 +564,9 @@ function cleanDead() {
   game.player.board = game.player.board.filter(m => m.health > 0);
   game.opponent.board = game.opponent.board.filter(m => m.health > 0);
   const countAfter = game.player.board.length + game.opponent.board.length;
-  game.stats.minionsKilled += (countBefore - countAfter);
+  const killed = countBefore - countAfter;
+  game.stats.minionsKilled += killed;
+  if (killed > 0) sfxDeath();
 }
 
 function checkGameOver() {
@@ -782,9 +1010,11 @@ function showGameOver(won) {
   const sub = $('#gameover-sub');
   const stats = $('#gameover-stats');
 
+  stopBgm();
   title.textContent = won ? '胜' : '败';
   title.className = 'gameover-title' + (won ? ' victory' : '');
   sub.textContent = won ? '江湖路远，大侠好走！' : '胜败乃兵家常事，来日再战。';
+  if (won) sfxVictory(); else sfxDefeat();
 
   stats.innerHTML = `
     <div class="gs"><div class="num">${Math.ceil(game.turn/2)}</div><div class="label">回合数</div></div>
@@ -888,10 +1118,19 @@ function init() {
   }
 
   // Menu buttons
+  // Mute button
+  isMuted = localStorage.getItem('wuxia_muted') === '1';
+  const muteBtn = $('#btn-mute');
+  if (muteBtn) {
+    muteBtn.textContent = isMuted ? '🔇' : '🔊';
+    muteBtn.addEventListener('click', toggleMute);
+  }
+
   $('#btn-start').addEventListener('click', () => {
     initGame();
     showScreen('battle-screen');
     render();
+    startBgm();
   });
 
   $('#btn-collection').addEventListener('click', () => {
@@ -921,8 +1160,10 @@ function init() {
     initGame();
     showScreen('battle-screen');
     render();
+    startBgm();
   });
   $('#btn-back-menu').addEventListener('click', () => {
+    stopBgm();
     renderMenuStats();
     showScreen('menu-screen');
   });
