@@ -7,28 +7,10 @@
 // ===== CARD DEFINITIONS =====
 const CARD_DEFS = [
   {
-    id:'yaotong', name:'药童', cost:1, attack:1, health:1,
-    type:'heal', icon:'童', skill:'灵丹妙药',
-    desc:'登场时恢复己方英雄3点生命',
-    keywords:[], battlecry:'healHero3',
-  },
-  {
-    id:'shaonv', name:'少女', cost:1, attack:1, health:2,
-    type:'heal', icon:'女', skill:'柔情似水',
-    desc:'每回合结束时恢复己方英雄1点生命',
-    keywords:['endHeal1'],
-  },
-  {
-    id:'anqishi', name:'暗器师', cost:1, attack:2, health:1,
-    type:'assassin', icon:'暗', skill:'暴雨梨花针',
-    desc:'冲锋：可在登场当回合立即攻击',
+    id:'zhuifeng', name:'追风', cost:1, attack:2, health:1,
+    type:'assassin', icon:'风', skill:'踏雪无痕',
+    desc:'冲锋：登场即可攻击',
     keywords:['charge'],
-  },
-  {
-    id:'biaoshi', name:'镖师', cost:2, attack:2, health:3,
-    type:'shield', icon:'镖', skill:'铁布衫',
-    desc:'嘲讽：敌方必须优先攻击此随从',
-    keywords:['taunt'],
   },
   {
     id:'duyi', name:'毒医', cost:2, attack:1, health:3,
@@ -37,46 +19,16 @@ const CARD_DEFS = [
     keywords:['poisonous'],
   },
   {
-    id:'youxia', name:'游侠', cost:2, attack:3, health:2,
-    type:'sword', icon:'游', skill:'拔剑术',
-    desc:'登场时对一个随机敌方随从造成1点伤害',
-    keywords:[], battlecry:'damage1random',
-  },
-  {
-    id:'bukuai', name:'捕快', cost:2, attack:2, health:2,
-    type:'sword', icon:'捕', skill:'缉拿归案',
-    desc:'登场时对敌方英雄造成1点伤害',
-    keywords:[], battlecry:'damageHero1',
-  },
-  {
-    id:'qinshi', name:'琴师', cost:3, attack:1, health:4,
-    type:'buff', icon:'琴', skill:'高山流水',
-    desc:'登场时使一个随机友方随从获得+1/+1',
-    keywords:[], battlecry:'buffRandom11',
-  },
-  {
-    id:'daoshi', name:'道士', cost:3, attack:2, health:4,
-    type:'heal', icon:'道', skill:'太极真气',
-    desc:'登场时恢复己方英雄4点生命',
-    keywords:[], battlecry:'healHero4',
-  },
-  {
-    id:'cike', name:'刺客', cost:3, attack:4, health:2,
-    type:'assassin', icon:'刺', skill:'暗影突袭',
-    desc:'冲锋：可在登场当回合立即攻击',
-    keywords:['charge'],
-  },
-  {
     id:'hufa', name:'护法', cost:3, attack:2, health:6,
     type:'shield', icon:'护', skill:'金钟罩',
     desc:'嘲讽：敌方必须优先攻击此随从',
     keywords:['taunt'],
   },
   {
-    id:'gaibang', name:'丐帮弟子', cost:3, attack:3, health:3,
-    type:'sword', icon:'丐', skill:'打狗棒法',
-    desc:'登场时若手牌≥3张，获得+1/+1',
-    keywords:[], battlecry:'buffIfHand3',
+    id:'cike', name:'刺客', cost:3, attack:4, health:2,
+    type:'assassin', icon:'刺', skill:'暗影突袭',
+    desc:'冲锋：登场即可攻击',
+    keywords:['charge'],
   },
   {
     id:'xiake', name:'侠客', cost:4, attack:3, health:5,
@@ -85,28 +37,16 @@ const CARD_DEFS = [
     keywords:[], battlecry:'drawCard',
   },
   {
-    id:'zhujian', name:'铸剑师', cost:4, attack:2, health:3,
-    type:'buff', icon:'铸', skill:'百炼成钢',
-    desc:'登场时使所有友方随从获得+1攻击',
-    keywords:[], battlecry:'buffAllAtk1',
+    id:'huanshi', name:'幻师', cost:5, attack:3, health:4,
+    type:'magic', icon:'幻', skill:'镜花水月',
+    desc:'登场时召唤一个2/2的幻影',
+    keywords:[], battlecry:'summonPhantom',
   },
   {
-    id:'wuseng', name:'武僧', cost:4, attack:4, health:3,
-    type:'sword', icon:'僧', skill:'七伤拳',
-    desc:'登场时己方英雄受2点伤害，但获得+2攻击',
-    keywords:[], battlecry:'selfDmg2atk2',
-  },
-  {
-    id:'zhangmen', name:'掌门', cost:5, attack:4, health:5,
-    type:'magic', icon:'掌', skill:'凌波微步',
-    desc:'闪避：不能被法术和技能指定为目标',
-    keywords:['elusive'],
-  },
-  {
-    id:'yinshi', name:'隐士', cost:6, attack:5, health:5,
-    type:'magic', icon:'隐', skill:'天外飞仙',
-    desc:'登场时对敌方英雄造成3点伤害',
-    keywords:[], battlecry:'damageHero3',
+    id:'jiansheng', name:'剑圣', cost:6, attack:5, health:5,
+    type:'sword', icon:'剑', skill:'万剑归宗',
+    desc:'登场时对一个随机敌方随从造成3点伤害',
+    keywords:[], battlecry:'damage3random',
   },
   {
     id:'daxia', name:'大侠', cost:7, attack:6, health:7,
@@ -115,6 +55,13 @@ const CARD_DEFS = [
     keywords:[], battlecry:'aoe2',
   },
 ];
+
+// Token card (not collectible, summoned by 幻师)
+const PHANTOM_DEF = {
+  id:'phantom', name:'幻影', cost:0, attack:2, health:2,
+  type:'magic', icon:'影', skill:'虚无',
+  desc:'幻师召唤的幻影', keywords:[], isToken:true,
+};
 
 const TYPE_NAMES = {
   sword:'剑', assassin:'刃', shield:'盾', poison:'毒',
@@ -176,9 +123,15 @@ function createMinion(def, owner) {
 }
 
 function buildDeck() {
-  // 2 copies of each card, shuffle, take DECK_SIZE
+  // 8 unique cards: low-cost cards get 3 copies, high-cost get 2 → exactly 20
+  // Cost 1-3: 3 copies each (4 cards × 3 = 12)
+  // Cost 4-7: 2 copies each (4 cards × 2 = 8)
+  // Total: 12 + 8 = 20
   let pool = [];
-  for (const d of CARD_DEFS) { pool.push(d, d); }
+  for (const d of CARD_DEFS) {
+    const copies = d.cost <= 3 ? 3 : 2;
+    for (let i = 0; i < copies; i++) pool.push(d);
+  }
   return shuffle(pool).slice(0, DECK_SIZE);
 }
 
@@ -287,30 +240,23 @@ function playCard(player, handIndex) {
 function executeBattlecry(bc, owner, enemy, minion) {
   if (!bc) return;
   switch (bc) {
-    case 'healHero3':
-      owner.hp = Math.min(STARTING_HP, owner.hp + 3);
-      showHealNumber(owner.isAI ? 'opp' : 'player', 3);
+    case 'drawCard':
+      drawCard(owner);
       break;
-    case 'healHero4':
-      owner.hp = Math.min(STARTING_HP, owner.hp + 4);
-      showHealNumber(owner.isAI ? 'opp' : 'player', 4);
+    case 'summonPhantom':
+      if (owner.board.length < MAX_BOARD) {
+        const phantom = createMinion(PHANTOM_DEF, minion.owner);
+        phantom.canAttack = false;
+        phantom.justPlayed = true;
+        owner.board.push(phantom);
+      }
       break;
-    case 'damageHero1':
-      enemy.hp -= 1;
-      game.stats[owner.isAI ? 'opponentDamageDealt' : 'playerDamageDealt'] += 1;
-      showDamageNumber(enemy.isAI ? 'opp' : 'player', 1);
-      break;
-    case 'damageHero3':
-      enemy.hp -= 3;
-      game.stats[owner.isAI ? 'opponentDamageDealt' : 'playerDamageDealt'] += 3;
-      showDamageNumber(enemy.isAI ? 'opp' : 'player', 3);
-      break;
-    case 'damage1random': {
+    case 'damage3random': {
       const targets = enemy.board.filter(m => !m.keywords.includes('elusive'));
       if (targets.length > 0) {
         const t = pick(targets);
-        t.health -= 1;
-        showDamageNumber('minion-' + t.uid, 1);
+        t.health -= 3;
+        showDamageNumber('minion-' + t.uid, 3);
       }
       break;
     }
@@ -318,36 +264,6 @@ function executeBattlecry(bc, owner, enemy, minion) {
       for (const m of enemy.board) {
         m.health -= 2;
         showDamageNumber('minion-' + m.uid, 2);
-      }
-      break;
-    case 'buffRandom11': {
-      const allies = owner.board.filter(m => m.uid !== minion.uid);
-      if (allies.length > 0) {
-        const a = pick(allies);
-        a.attack += 1;
-        a.health += 1;
-        a.maxHealth += 1;
-      }
-      break;
-    }
-    case 'buffAllAtk1':
-      for (const m of owner.board) {
-        if (m.uid !== minion.uid) m.attack += 1;
-      }
-      break;
-    case 'drawCard':
-      drawCard(owner);
-      break;
-    case 'selfDmg2atk2':
-      owner.hp -= 2;
-      minion.attack += 2;
-      showDamageNumber(owner.isAI ? 'opp' : 'player', 2);
-      break;
-    case 'buffIfHand3':
-      if (owner.hand.length >= 3) {
-        minion.attack += 1;
-        minion.health += 1;
-        minion.maxHealth += 1;
       }
       break;
   }
@@ -400,13 +316,6 @@ function doAttack(attackerUid, targetUid) {
 
 function endTurn() {
   const p = game.isPlayerTurn ? game.player : game.opponent;
-
-  // End-of-turn effects (e.g., 少女 heal)
-  for (const m of p.board) {
-    if (m.def.keywords.includes('endHeal1')) {
-      p.hp = Math.min(STARTING_HP, p.hp + 1);
-    }
-  }
 
   game.isPlayerTurn = !game.isPlayerTurn;
   game.selectedHandIndex = -1;
@@ -600,8 +509,7 @@ function renderPlayerHand() {
     if (!canPlay && game.isPlayerTurn) el.classList.add('unplayable');
     if (i === game.selectedHandIndex) el.classList.add('selected');
 
-    const kwText = def.keywords.filter(k => k !== 'endHeal1')
-      .map(k => ({ charge:'冲锋', taunt:'嘲讽', poisonous:'剧毒', elusive:'闪避' }[k] || '')).join(' ');
+    const kwText = def.keywords.map(k => ({ charge:'冲锋', taunt:'嘲讽', poisonous:'剧毒', elusive:'闪避' }[k] || '')).join(' ');
 
     el.innerHTML = `
       <div class="hc-top">
