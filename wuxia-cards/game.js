@@ -4,6 +4,10 @@
 
 'use strict';
 
+// ===== IMAGE PATH HELPER =====
+const IMG_BASE = './assets/images/';
+function cardImg(id) { return IMG_BASE + id + '.jpg'; }
+
 // ===== CARD DEFINITIONS =====
 const CARD_DEFS = [
   {
@@ -516,7 +520,7 @@ function renderPlayerHand() {
         <span class="hc-cost">${def.cost}</span>
         <span class="hc-kw">${kwText}</span>
       </div>
-      <div class="hc-body"><span class="hc-icon">${def.icon}</span></div>
+      <div class="hc-body"><img class="hc-img" src="${cardImg(def.id)}" alt="${def.name}" onerror="this.style.display='none';this.nextElementSibling.style.display=''"><span class="hc-icon" style="display:none">${def.icon}</span></div>
       <div class="hc-name">${def.name}</div>
       <div class="hc-skill">${def.desc}</div>
       <div class="hc-bottom">
@@ -569,7 +573,7 @@ function renderBoard(zoneId, board, isPlayer) {
     el.innerHTML = `
       ${sleeping ? '<span class="m-sleeping">zzz</span>' : ''}
       ${kwBadge ? '<span class="m-kw">' + kwBadge + '</span>' : ''}
-      <span class="m-icon">${m.def.icon}</span>
+      <img class="m-img" src="${cardImg(m.def.id)}" alt="${m.def.name}" onerror="this.style.display='none';this.nextElementSibling.style.display=''"><span class="m-icon" style="display:none">${m.def.icon}</span>
       <span class="m-name">${m.def.name}</span>
       <div class="m-stats">
         <span class="m-atk">⚔${m.attack}</span>
@@ -749,7 +753,7 @@ function showCardDetail(def) {
 
   $('#card-detail-content').innerHTML = `
     <div class="cd-cost">${def.cost}</div>
-    <div class="cd-icon">${def.icon}</div>
+    <div class="cd-img-wrap"><img class="cd-img" src="${cardImg(def.id)}" alt="${def.name}" onerror="this.style.display='none';this.parentElement.querySelector('.cd-icon-fb').style.display=''"><span class="cd-icon-fb" style="display:none">${def.icon}</span></div>
     <div class="cd-name">${def.name}</div>
     <div class="cd-type">${TYPE_NAMES[def.type] || def.type}${kwNames ? ' · ' + kwNames : ''}</div>
     <div class="cd-line"></div>
@@ -802,7 +806,7 @@ function renderCollection() {
     el.className = 'col-card';
     el.innerHTML = `
       <span class="cc-cost">${def.cost}</span>
-      <span class="cc-icon">${def.icon}</span>
+      <img class="cc-img" src="${cardImg(def.id)}" alt="${def.name}" onerror="this.style.display='none';this.nextElementSibling.style.display=''"><span class="cc-icon" style="display:none">${def.icon}</span>
       <span class="cc-name">${def.name}</span>
       <span class="cc-stats">⚔${def.attack} ♥${def.health}</span>
     `;
