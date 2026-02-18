@@ -6,7 +6,7 @@
 
 // ===== IMAGE PATH HELPER =====
 const IMG_BASE = './assets/images/';
-function cardImg(id) { return IMG_BASE + id + '.jpg'; }
+function cardImg(id) { return IMG_BASE + id + '.png'; }
 
 // ===== CARD DEFINITIONS =====
 const CARD_DEFS = [

@@ -1,20 +1,20 @@
-const CACHE_NAME = 'wuxia-cards-v2';
+const CACHE_NAME = 'wuxia-cards-v3';
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './game.js',
   './manifest.json',
-  './assets/images/jiansheng.jpg',
-  './assets/images/cike.jpg',
-  './assets/images/duyi.jpg',
-  './assets/images/hufa.jpg',
-  './assets/images/xiake.jpg',
-  './assets/images/zhuifeng.jpg',
-  './assets/images/huanshi.jpg',
-  './assets/images/daxia.jpg',
-  './assets/images/bg-menu.jpg',
-  './assets/images/bg-battle.jpg',
+  './assets/images/jiansheng.png',
+  './assets/images/cike.png',
+  './assets/images/duyi.png',
+  './assets/images/hufa.png',
+  './assets/images/xiake.png',
+  './assets/images/zhuifeng.png',
+  './assets/images/huanshi.png',
+  './assets/images/daxia.png',
+  './assets/images/bg-menu.png',
+  './assets/images/bg-battle.png',
 ];
 
 self.addEventListener('install', e => {
